@@ -204,6 +204,11 @@ void backward_convolutional_layer(layer l, matrix prev_delta)
 void update_convolutional_layer(layer l, float rate, float momentum, float decay)
 {
     // TODO: 5.3 Update the weights, similar to the connected layer.
+    axpy_matrix(-decay, l.w, l.dw);
+    axpy_matrix(rate, l.dw, l.w);
+    scal_matrix(momentum, l.dw);
+    axpy_matrix(rate, l.db, l.b);
+    scal_matrix(momentum, l.db);
 }
 
 // Make a new convolutional layer
