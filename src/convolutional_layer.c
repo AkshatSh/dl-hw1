@@ -35,6 +35,24 @@ void backward_convolutional_bias(matrix delta, matrix db)
     }
 }
 
+void set_column(matrix out, image im, int col, int size, int x, int y) {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            int xcoor = x - size / 2 + i; // relative x position
+            int ycoor = y - size / 2 + j; // relative y position
+            for (int c = 0; c < im.c; c++) {
+                int offset = c*size*size;
+                // get the value from the image
+                float val = get_pixel(im, xcoor, ycoor, c);
+
+                // set the right value in the proper column
+                out.data[col * out.rows + offset + x * size + y] = val;
+            }
+        }
+    }
+
+}
+
 // Make a column matrix out of an image
 // image im: image to process
 // int size: kernel size for convolution operation
@@ -49,6 +67,14 @@ matrix im2col(image im, int size, int stride)
     matrix col = make_matrix(rows, cols);
 
     // TODO: 5.1 - fill in the column matrix
+    int num_conv = 0;
+    for (int i = 0; i < rows; i += stride){
+        for (int j = 0; j < rows; j+= stride) {
+            // iterate over every pixel in the image
+            set_column(col, im, num_conv, size, i, j);
+            num_conv++;
+        }
+    }
 
     return col;
 }
