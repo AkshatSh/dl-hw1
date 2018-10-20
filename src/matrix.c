@@ -52,7 +52,12 @@ matrix copy_matrix(matrix m)
 {
     matrix c = make_matrix(m.rows, m.cols);
     // TODO: 1.1 - Fill in the new matrix
-
+    for (int row = 0; row < m.rows; row++) {
+        for (int col = 0; col < m.cols; col++) {
+            int index = row * m.cols + col;
+            c.data[index] = m.data[index];
+        }
+    }
 
     return c;
 }
@@ -63,8 +68,14 @@ matrix copy_matrix(matrix m)
 matrix transpose_matrix(matrix m)
 {
     // TODO: 1.2 - Make a matrix the correct size, fill it in
-    matrix t = make_matrix(1,1);
-
+    matrix t = make_matrix(m.cols, m.rows);
+    for (int row = 0; row < m.rows; row++) {
+        for (int col = 0; col < m.cols; col++) {
+            int index = row * m.cols + col;
+            int transposed = col * m.rows + row;
+            t.data[transposed] = m.data[index];
+        }
+    }
 
     return t;
 }
@@ -78,6 +89,12 @@ void axpy_matrix(float a, matrix x, matrix y)
     assert(x.cols == y.cols);
     assert(x.rows == y.rows);
     // TODO: 1.3 - Perform the weighted sum, store result back in y
+    for (int row = 0; row < x.rows; row++) {
+        for (int col = 0; col < x.cols; col++) {
+            int index = row * x.cols + col;
+            y.data[index] += x.data[index] * a;
+        }
+    }
 }
 
 // Perform matrix multiplication a*b, return result
@@ -87,8 +104,19 @@ matrix matmul(matrix a, matrix b)
 {
     matrix c = make_matrix(a.rows, b.cols);
     // TODO: 1.4 - Implement matrix multiplication. Make sure it's fast!
+    assert(a.cols == b.rows);
 
-
+    
+    for (int row = 0; row < c.rows; row++) {
+        for (int internal = 0; internal < a.cols; internal++) {
+            for (int col = 0; col < c.cols; col++) {
+                int index = row * c.cols + col;
+                int aIndex = row * a.cols + internal; // a[row][internal]
+                int bIndex = internal * b.cols + col; // b[internal][col]
+                c.data[index] += (a.data[aIndex] * b.data[bIndex]);
+            }
+        }
+    }
 
     return c;
 }

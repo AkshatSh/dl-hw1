@@ -15,17 +15,21 @@ void activate_matrix(matrix m, ACTIVATION a)
             double x = m.data[i*m.cols + j];
             if(a == LOGISTIC){
                 // TODO
+                m.data[i*m.cols + j] = 1.0 / (1.0 + exp(-x));
             } else if (a == RELU){
-                // TODO
+               m.data[i*m.cols + j] = x > 0 ? x : 0;
             } else if (a == LRELU){
-                // TODO
+                m.data[i*m.cols + j] = x > 0 ? x : 0.1 * x;
             } else if (a == SOFTMAX){
-                // TODO
+                 m.data[i*m.cols + j] = exp(x);
             }
             sum += m.data[i*m.cols + j];
         }
         if (a == SOFTMAX) {
             // TODO: have to normalize by sum if we are using SOFTMAX
+            for(j = 0; j < m.cols; j++) {
+                m.data[i*m.cols + j] /= sum;
+            }
         }
     }
 }
@@ -41,7 +45,17 @@ void gradient_matrix(matrix m, ACTIVATION a, matrix d)
     for(i = 0; i < m.rows; ++i){
         for(j = 0; j < m.cols; ++j){
             double x = m.data[i*m.cols + j];
+            double gradient = 1.0;
             // TODO: multiply the correct element of d by the gradient
+            if(a == LOGISTIC){
+                gradient = x  * (1.0 - x);
+            } else if (a == RELU){
+                gradient = x > 0 ? 1 : 0;
+            } else if (a == LRELU){
+                gradient = x > 0 ? 1 : 0.1;
+            }
+
+            d.data[i*m.cols + j] *= gradient;
         }
     }
 }
