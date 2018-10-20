@@ -79,6 +79,26 @@ matrix im2col(image im, int size, int stride)
     return col;
 }
 
+void update_column(matrix in, image out, int col, int size, int x, int y) {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            int xcoor = x - size / 2 + i; // relative x position
+            int ycoor = y - size / 2 + j; // relative y position
+            for (int c = 0; c < out.c; c++) {
+                int offset = c*size*size;
+                // get the value from the image
+                float old_val = get_pixel(out, xcoor, ycoor, c);
+
+                // get the new value from the input matrix
+                float new_val = in.data[col * in.rows + offset + x * size + y];
+
+                // set the pixel to add the new conv value
+                set_pixel(out, xcoor, ycoor, c, new_val + old_val);
+            }
+        }
+    }
+}
+
 // The reverse of im2col, add elements back into image
 // matrix col: column matrix to put back into image
 // int size: kernel size
@@ -92,7 +112,14 @@ void col2im(matrix col, int size, int stride, image im)
     int cols = outw * outh;
 
     // TODO: 5.2 - add values into image im from the column matrix
-
+    int num_conv = 0;
+    for (int i = 0; i < rows; i += stride){
+        for (int j = 0; j < rows; j+= stride) {
+            // iterate over every pixel in the image
+            update_column(col, im, num_conv, size, i, j);
+            num_conv++;
+        }
+    }
 }
 
 // Run a convolutional layer on input
