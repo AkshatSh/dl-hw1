@@ -5,6 +5,31 @@
 #include "uwnet.h"
 
 
+void get_max_pool(matrix in, matrix out, int x, int y, layer l, int output, int outw, int outh) {
+    float max_val = 0;
+    int size = l.size;
+    int first = 1;
+    for (int c = 0; c < l.channels; c++) {
+        int offset = l.width * l.height * c;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                int xcoor = x - size / 2 + i; // relative x position
+                int ycoor = y - size / 2 + j; // relative y position
+                float val = in.data[offset + x * in.cols + y];
+
+                if (first) {
+                    max_val = val;
+                    first = 0;
+                } else {
+                    max_val = max_val < val ? val : max_val;
+                }
+            }
+        }
+
+        out.data[outw*outh*c + output] = max_val;
+    }
+}
+
 // Run a maxpool layer on input
 // layer l: pointer to layer to run
 // matrix in: input to layer
@@ -16,6 +41,16 @@ matrix forward_maxpool_layer(layer l, matrix in)
     matrix out = make_matrix(in.rows, outw*outh*l.channels);
 
     // TODO: 6.1 - iterate over the input and fill in the output with max values
+
+    int num_conv = 0;
+    for (int i = 0; i < in.rows; i += l.stride){
+        for (int j = 0; j < in.cols; j+= l.stride) {
+            // iterate over every pixel in the image
+            get_max_pool(in, out, i, j, l, num_conv, outw, outh);
+            // float max = get_max_pool(in, out, num_conv, l.size, i, j);
+            num_conv++;
+        }
+    }
 
     l.in[0] = in;
     free_matrix(l.out[0]);
