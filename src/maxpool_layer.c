@@ -15,7 +15,12 @@ void get_max_pool(matrix in, matrix out, int x, int y, layer l, int output, int 
             for (int j = 0; j < size; j++) {
                 int xcoor = x - size / 2 + i; // relative x position
                 int ycoor = y - size / 2 + j; // relative y position
-                float val = in.data[offset + x * in.cols + y];
+                float val;
+                if (xcoor < 0 || ycoor < 0 || xcoor >= in.rows || ycoor >= in.cols) {
+                    val = 0;
+                } else {
+                    val = in.data[offset + xcoor * in.cols + ycoor];
+                }
 
                 if (first) {
                     max_val = val;
@@ -60,6 +65,22 @@ matrix forward_maxpool_layer(layer l, matrix in)
     return out;
 }
 
+void set_max_pool(matrix prev_delta, matrix delta, int x, int y, layer l, int output, int outw, int outh) {
+    int size = l.size;
+    int first = 1;
+    for (int c = 0; c < l.channels; c++) {
+        int offset = l.width * l.height * c;
+        float max_val = prev_delta.data[outw*outh*c + output];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                int xcoor = x - size / 2 + i; // relative x position
+                int ycoor = y - size / 2 + j; // relative y position
+                delta.data[offset + xcoor * delta.cols + ycoor] = max_val;
+            }
+        }
+    }
+}
+
 // Run a maxpool layer backward
 // layer l: layer to run
 // matrix prev_delta: error term for the previous layer
@@ -75,6 +96,15 @@ void backward_maxpool_layer(layer l, matrix prev_delta)
     // TODO: 6.2 - find the max values in the input again and fill in the
     // corresponding delta with the delta from the output. This should be
     // similar to the forward method in structure.
+    int num_conv = 0;
+    for (int i = 0; i < in.rows; i += l.stride){
+        for (int j = 0; j < in.cols; j+= l.stride) {
+            // iterate over every pixel in the image
+            set_max_pool(in, out, i, j, l, num_conv, outw, outh);
+            // float max = get_max_pool(in, out, num_conv, l.size, i, j);
+            num_conv++;
+        }
+    }
 
 }
 
