@@ -35,19 +35,22 @@ void backward_convolutional_bias(matrix delta, matrix db)
     }
 }
 
-void set_column(matrix out, image im, int col, int size, int x, int y) {
+void set_column(matrix out, image im, int col, int size, int x, int y, int c) {
+    int index = 0;
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            int xcoor = x - size / 2 + i; // relative x position
-            int ycoor = y - size / 2 + j; // relative y position
-            for (int c = 0; c < im.c; c++) {
-                int offset = c*size*size;
-                // get the value from the image
-                float val = get_pixel(im, xcoor, ycoor, c);
+            long xcoor = x - size / 2 + i; // relative x position
+            long ycoor = y - size / 2 + j; // relative y position
+            long channeloffset = c*size*size*out.cols;
 
-                // set the right value in the proper column
-                out.data[col * out.rows + offset + x * size + y] = val;
-            }
+            long columnoffset = 0; //col * out.rows;
+
+            // get the value from the image
+            float val = get_pixel(im, xcoor, ycoor, c);
+
+            // set the right value in the proper column
+            out.data[channeloffset + index * out.cols + col] = val;
+            index++;
         }
     }
 
@@ -67,34 +70,38 @@ matrix im2col(image im, int size, int stride)
     matrix col = make_matrix(rows, cols);
 
     // TODO: 5.1 - fill in the column matrix
-    int num_conv = 0;
-    for (int i = 0; i < rows; i += stride){
-        for (int j = 0; j < rows; j+= stride) {
-            // iterate over every pixel in the image
-            set_column(col, im, num_conv, size, i, j);
-            num_conv++;
+    for (int c =0 ; c < im.c; c++) {
+        int num_conv = 0;
+        for (int i = 0; i < im.w; i += stride){
+            for (int j = 0; j < im.h; j+= stride) {
+                // iterate over every pixel in the image
+                set_column(col, im, num_conv, size, i, j, c);
+                num_conv++;
+            }
         }
     }
 
     return col;
 }
 
-void update_column(matrix in, image out, int col, int size, int x, int y) {
+void update_column(matrix in, image out, int col, int size, int x, int y, int c) {
+    int index = 0;
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            int xcoor = x - size / 2 + i; // relative x position
-            int ycoor = y - size / 2 + j; // relative y position
-            for (int c = 0; c < out.c; c++) {
-                int offset = c*size*size;
-                // get the value from the image
-                float old_val = get_pixel(out, xcoor, ycoor, c);
+            long xcoor = x - size / 2 + i; // relative x position
+            long ycoor = y - size / 2 + j; // relative y position
+            long channeloffset = c*size*size*in.cols;
 
-                // get the new value from the input matrix
-                float new_val = in.data[col * in.rows + offset + x * size + y];
+            // get the value from the image
+            float old_val = get_pixel(out, xcoor, ycoor, c);
 
-                // set the pixel to add the new conv value
+            // set the right value in the proper column
+            float new_val = in.data[channeloffset + index * in.cols + col];
+
+            if (xcoor >= 0 && xcoor < out.h && ycoor >= 0 && ycoor < out.w) {
                 set_pixel(out, xcoor, ycoor, c, new_val + old_val);
             }
+            index++;
         }
     }
 }
@@ -112,12 +119,23 @@ void col2im(matrix col, int size, int stride, image im)
     int cols = outw * outh;
 
     // TODO: 5.2 - add values into image im from the column matrix
-    int num_conv = 0;
-    for (int i = 0; i < rows; i += stride){
-        for (int j = 0; j < rows; j+= stride) {
-            // iterate over every pixel in the image
-            update_column(col, im, num_conv, size, i, j);
-            num_conv++;
+    // int num_conv = 0;
+    // for (int i = 0; i < rows; i += stride){
+    //     for (int j = 0; j < rows; j+= stride) {
+    //         // iterate over every pixel in the image
+    //         update_column(col, im, num_conv, size, i, j);
+    //         num_conv++;
+    //     }
+    // }
+
+    for (int c = 0; c < im.c; c++) {
+        int num_conv = 0;
+        for (int i = 0; i < im.w; i += stride){
+            for (int j = 0; j < im.h; j+= stride) {
+                // iterate over every pixel in the image
+                update_column(col, im, num_conv, size, i, j, c);
+                num_conv++;
+            }
         }
     }
 }
@@ -193,7 +211,6 @@ void backward_convolutional_layer(layer l, matrix prev_delta)
         free_matrix(dw);
     }
     free_matrix(wt);
-
 }
 
 // Update convolutional layer
