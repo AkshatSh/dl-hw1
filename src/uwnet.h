@@ -38,6 +38,7 @@ typedef struct layer {
 layer make_connected_layer(int inputs, int outputs, ACTIVATION activation);
 layer make_convolutional_layer(int w, int h, int c, int filters, int size, int stride, ACTIVATION activation);
 layer make_maxpool_layer(int w, int h, int c, int size, int stride);
+matrix im2col(image im, int size, int stride);
 
 typedef struct {
     layer *layers;
