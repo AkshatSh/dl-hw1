@@ -14,7 +14,7 @@ class Block(nn.Module):
         super(Block, self).__init__()
         self.conv3 = nn.Conv2d(in_channels, out_channels, kernel_size=3)
         self.conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=2)
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, dial)
         self.bn = nn.BatchNorm2d(out_channels)
     
     def forward(self, x):
@@ -46,6 +46,8 @@ class TinyImagenetNet(nn.Module):
         batch = x.shape[0]
         x = self.conv1(x)
         x = self.conv2(x)
+        x = self.conv3(x)
+        self.conv3_drop(x)
         x = x.view(batch, -1)
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
