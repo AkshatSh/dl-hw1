@@ -46,7 +46,7 @@ void test_im2col() {
     };
 
     // matrix x = make_matrix(2,3);
-    image example = float_to_image(input_data, 3, 2, 1);
+    image example = float_to_image(input_data, 1, 1, 1);
     matrix x = im2col(example, 3, 2);
     for (int i = 0; i < x.rows; i++) {
         printf("");
