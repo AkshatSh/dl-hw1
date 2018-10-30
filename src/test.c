@@ -39,15 +39,7 @@ void test_matrix_speed()
     printf("Transpose elapsed %lf sec\n", what_time_is_it_now() - start);
 }
 
-void test_im2col() {
-    float input_data[] = {
-        1,2,3,
-        4,5,6
-    };
-
-    // matrix x = make_matrix(2,3);
-    image example = float_to_image(input_data, 1, 1, 1);
-    matrix x = im2col(example, 3, 2);
+void test_print_matrix(matrix x) {
     for (int i = 0; i < x.rows; i++) {
         printf("");
         for (int j =0; j < x.cols; j++) {
@@ -57,10 +49,36 @@ void test_im2col() {
     }
 }
 
+void test_im2col() {
+    float input_data[] = {
+        1,2,3,
+        4,5,6
+    };
+
+    // matrix x = make_matrix(2,3);
+    image example = float_to_image(input_data, 3, 2, 1);
+    matrix x = im2col(example, 2, 2);
+    print_matrix(x);
+}
+
+void test_forward_maxpool() {
+    float input_data[] = {
+        1,3,6,
+        4,5,2
+    };
+
+    matrix in = make_matrix(1, 6);
+    in.data = input_data;
+    layer l = make_maxpool_layer(3, 2, 1, 1, 1);
+    matrix out = forward_maxpool_layer(l, in);
+    print_matrix(out);
+}
+
 void run_tests()
 {
-    test_matrix_speed();
-    test_im2col();
+    // test_matrix_speed();
+    ///test_im2col();
+    test_forward_maxpool();
     //printf("%d tests, %d passed, %d failed\n", tests_total, tests_total-tests_fail, tests_fail);
 }
 
