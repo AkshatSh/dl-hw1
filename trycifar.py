@@ -16,16 +16,16 @@ def conv_net():
     Each layer computes a size * size * filter for each input in the input tensor
 
     l1: 32 * 32 * 3 * 8 * 3 * 3 = 221184
-    l2: 32 / 2 * 32 / 2 * 8 * 3 * 3 = 18432
+    l2: Max Pool
     l3: 16 * 16 * 8 * 16 * 3 * 3 = 294912
-    l4: 16 /2 * 16 /2 * 16 * 3 * 3 = 9216
+    l4: Max Pool
     l5: 8 * 8 * 16 * 32 * 3 * 3 = 294912
-    l6: 8 / 2 * 8 / 2 * 32 * 3 * 3 = 4608
+    l6: Max Pool
     l7: 4 * 4 * 32 * 64 * 3 * 3 = 294912
-    l8: 4 /2 * 4 /2 * 64 * 3 * 3 = 1536
+    l8: Max Pool 
     l9: 256 * 10 = 2560
 
-    1,142,272
+    1,108,480 Total Operations
 
     '''
     l = [   make_convolutional_layer(32, 32, 3, 8, 3, 1, LRELU),
