@@ -55,7 +55,7 @@ def your_net():
     l4: batch * 128 * 64 = (batch, 64)
     l5: batch * 64 * 10 = (batch, 10)
 
-    Total Operations: 893568 * batch_size
+    Total Operations: 893,568 * batch_size
     '''
     l = [   
         make_connected_layer(3072, 256 , LRELU),
