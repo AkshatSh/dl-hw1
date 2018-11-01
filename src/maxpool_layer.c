@@ -72,19 +72,6 @@ matrix forward_maxpool_layer(layer l, matrix in)
 }
 
 void set_max_pool(matrix in, matrix prev_delta, matrix delta, int x, int y, int c, layer l, int output, int outw, int outh) {
-    // x = l.stride * x;
-    // y = l.stride * y;
-    // int size = l.size;
-    // int first = 1;
-    // int offset = l.width * l.height * c;
-    // float max_val = in.data[outw*outh*c + output];
-    // for (int i = 0; i < size; i++) {
-    //     for (int j = 0; j < size; j++) {
-    //         int xcoor = x - size / 2 + i; // relative x position
-    //         int ycoor = y - size / 2 + j; // relative y position
-    //         delta.data[offset + xcoor * delta.cols + ycoor] = delta_val;
-    //     }
-    // }
     float max_val = 0;
     long max_index = 0;
     int size = l.size;
@@ -115,8 +102,6 @@ void set_max_pool(matrix in, matrix prev_delta, matrix delta, int x, int y, int 
             }
         }
     }
-    // printf("max_index : %ld max val: %f\n", max_index, max_val);
-    // delta.data[outw*outh*c + output] += prev_delta.data[max_index];
     prev_delta.data[max_index] = delta.data[outw*outh*c + output];
 }
 
