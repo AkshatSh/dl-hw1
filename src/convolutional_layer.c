@@ -44,17 +44,6 @@ void set_column(matrix out, image im, int col, int size, int x, int y, int c) {
             long channeloffset = c*size*size*out.cols;
             float val = get_pixel(im, ycoor, xcoor, c);
 
-
-            // get the value from the image
-            // if(xcoor >= im.h || ycoor >= im.w || xcoor < 0 || ycoor < 0) {
-            //     val = 0;
-            // } else {
-            //     val = im.data[xcoor * im.w + ycoor];
-            // }
-
-            
-            // printf("val (%d, %d, %d): %f, %f\n", xcoor, ycoor, c, val, val2);
-
             // set the right value in the proper column
             out.data[channeloffset + index * out.cols + col] = val;
             index++;
@@ -87,42 +76,6 @@ matrix im2col(image im, int size, int stride)
             }
         }
     }
-    // int halfFil = size / 2;
-    // int colidx = 0;
-    // for (int channel = 0; channel < im.c; channel++) {
-    //     int channelOffset = channel * size * size * outw * outh; // correct
-
-    //     for (int i = 0; i < im.h; i+= stride) {
-    //         for (int j = 0; j < im.w; j+= stride) {
-    //             int k = 0;
-    //             int fRow = i - halfFil;
-    //             while (k < size) {
-    //                 int l = 0;
-    //                 int fCol = j - halfFil;
-    //                 while (l < size) {
-    //                     int index = k * size + l;
-    //                     int colIndex = channelOffset + (index * cols) + colidx;
-    //                     // printf("looking up fRow: %d, fCol: %d\n", fRow + k, fCol + l);
-
-    //                     int rowi = fRow + k;
-    //                     int coli = fCol + l;
-
-    //                     if (rowi < 0 || coli < 0 || rowi > im.h || coli > im.w) {
-    //                         col.data[colIndex] = 0.0;
-    //                     } else {
-    //                         float val = get_pixel(im, coli, rowi, channel);
-    //                         int imIndex = (channel * im.h * im.w) + ((i + fRow) * im.w) + (j + fCol);
-    //                         // printf("setting colIdx: %d to %f", colIndex, val);
-    //                         col.data[colIndex] = val;
-    //                     }
-    //                     l++;
-    //                 }
-    //                 k++;
-    //             }
-    //             colidx++;
-    //         }
-    //     }
-    // }
 
     return col;
 }
